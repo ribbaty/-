@@ -1,12 +1,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const generateDateIdeas = async (
   currentMood: string = "浪漫",
   count: number = 5
 ): Promise<string[]> => {
   try {
+    // 每次调用时实例化，确保获取最新的 process.env.API_KEY
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+    
     const prompt = `为情侣生成 ${count} 个${currentMood}的今天可以做的具体活动建议。
     要求：
     1. 格式必须严格遵守：'主题：具体要做的事'。
@@ -36,6 +37,7 @@ export const generateDateIdeas = async (
     return [];
   } catch (error) {
     console.error("Error generating date ideas:", error);
+    // 降级方案
     return [
       "微光影院：找一部老电影关灯一起看",
       "美食探店：去附近评价最高的甜品店",

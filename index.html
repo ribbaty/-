@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>DECIDE - Love Spinner</title>
+    <!-- 补丁：防止 process.env 在浏览器中未定义导致白屏 -->
+    <script>
+      window.process = window.process || { env: {} };
+    </script>
     <!-- Web App 适配 -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -15,18 +19,16 @@
     <style>
       body {
         font-family: 'Inter', 'Noto Sans SC', sans-serif;
-        background-color: #F3F4F6; /* Gray-100 */
+        background-color: #FDFDFD;
         color: #111827;
-        -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+        -webkit-tap-highlight-color: transparent;
       }
-      /* Hide scrollbar for Chrome, Safari and Opera */
       .no-scrollbar::-webkit-scrollbar {
           display: none;
       }
-      /* Hide scrollbar for IE, Edge and Firefox */
       .no-scrollbar {
-          -ms-overflow-style: none;  /* IE and Edge */
-          scrollbar-width: none;  /* Firefox */
+          -ms-overflow-style: none;
+          scrollbar-width: none;
       }
     </style>
   <script type="importmap">
@@ -44,5 +46,6 @@
 </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
   </body>
 </html>
