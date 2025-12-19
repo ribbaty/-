@@ -5,87 +5,123 @@ import AISuggestion from './components/AISuggestion';
 import { DateIdea, TabView, WheelMode } from './types';
 import { Sparkles, History, LayoutGrid } from 'lucide-react';
 
+const STORAGE_KEY = 'spark-v5';
+
+// 聚焦于“今天”可以做的、非同居、无“约会”字眼的行为池
 const SYSTEM_POOL = [
-    "冷知识交换：分享一个只有你才知道的奇怪冷知识",
-    "平行时空：如果现在有无限资金，最想去哪里开启第二人生？",
-    "技能互换：教对方一个你拿手的小动作或小技能",
-    "脑洞实验室：如果我们共同创业，最想做一个什么样的产品？",
-    "情绪垃圾桶：吐槽一件不爽的小事，对方只需静静倾听",
-    "审美碰撞：分享一段音乐，说出它打动你的那个瞬间",
-    "避雷指南：互相坦诚一个绝对不能踩的社交雷点",
-    "成就互吹：认真地夸奖对方一个你一直佩服的优点",
-    "未来快进：想象10年后的我们，各自会有什么改变？",
-    "手机断舍离：接下来的20分钟，放下手机进行面对面交流",
-    "盲盒探店：打开地图随机选一个没去过的店，今天就去那里",
-    "人生清单：各自说出3件这辈子必做的清单项",
-    "播客时刻：一起听一段深度访谈片段，分享受启发的点",
-    "反向挑战：去做一件平时觉得“傻”的事",
-    "空间改造：如果共同装饰房间，你会选什么配色和风格？",
-    "真心话：问对方一个你好奇已久但一直没开口的问题"
+    "味觉挑战：去超市买三种从未吃过的零食回来盲测",
+    "瞬间捕手：互相为对方拍一张以“笑容”为主题的抓拍",
+    "盲盒指南：抛硬币决定在下个路口左转还是右转",
+    "书海寻踪：在最近的书店给对方挑一本想读的书",
+    "反向点餐：晚饭点餐时完全由对方决定你吃什么",
+    "落日追踪：找一个视野开阔的地方，一起看完整的日落",
+    "时光寄语：给一年后的对方写一张现在不能看的明信片",
+    "自然呼吸：去最近的公园坐着听10分钟大自然的声音",
+    "河边晚风：散步时分享一件今天让你觉得小确幸的事",
+    "甜度测试：去奶茶店尝试一种从未点过的怪味配方",
+    "心跳快闪：在接下来的10分钟内，为对方准备一个5元的小惊喜",
+    "摄影比赛：寻找街道上最有烟火气的角落，看谁拍得更有感",
+    "云端投影：今晚同步看同一部电影，结束后视频语音分享",
+    "旧地重游：带对方去一个你小时候常去的“秘密基地”",
+    "人生剧场：观察路人，一起脑补他们的职业和背后故事",
+    "博物馆日：去最近的展馆看场不需要预约的小众展览",
+    "歌单交换：互相把对方最近单曲循环最多的歌完整听一遍",
+    "街头觅食：寻找一家名字听起来最奇怪或有趣的街边小吃",
+    "愿望清单：各自说出一件想和对方一起去做的冒险尝试",
+    "突击探班：在对方忙碌结束后的出口给一个结实的拥抱",
+    "平行时空：如果不做现在的工作，你最想体验什么人生？",
+    "深夜谈心：打一个长长的电话，只聊那些不切实际的梦想",
+    "反差挑战：穿一件平时你绝对不会穿的风格去见对方",
+    "运动瞬间：相约去附近的操场慢跑15分钟或练习拉伸",
+    "文创收集：在路过的店里找一个能代表今天记忆的小物件",
+    "理想之屋：一起构思如果未来住在一起，客厅必须有的三样东西",
+    "审美挑战：去文具店选一张你觉得最符合对方气质的贴纸",
+    "灵魂拷问：问一个关于对方成长背景中转折点的问题",
+    "记忆搜寻：分享一个你手机里对你意义重大但不常给人看的照片",
+    "光影实验：寻找一处有霓虹灯的地方，拍一组电影感合影",
+    "即兴动作：在没人注意的地方，一起做一套搞怪的自创动作",
+    "技能交换：现场教对方一个你擅长的冷门小技能",
+    "秘密路线：带对方走一条你私藏的、风景最好的步行路",
+    "味觉盲盒：买两瓶不同品牌的同类饮料进行盲测对比",
+    "生活碎片：一起去花卉市场买一束应季的鲜花分给对方",
+    "致敬经典：模仿一张经典电影海报里的动作现场合影"
 ];
 
-// 优化后的莫兰迪配色方案，提升视觉对比度
 const COLORS = [
-  '#E5E7EB', // Slate 200
-  '#D1D5DB', // Slate 300
-  '#E0E7FF', // Indigo 100
-  '#F3E8FF', // Purple 100
-  '#FAE8FF', // Pink 100
-  '#FCE7F3', // Rose 100
-  '#FEF3C7', // Amber 100
-  '#ECFDF5', // Emerald 50
+  '#E5E7EB', '#D1D5DB', '#E0E7FF', '#F3E8FF', '#FAE8FF', '#FCE7F3', '#FEF3C7', '#ECFDF5',
 ];
 
 const shuffle = (array: any[]) => {
-    let currentIndex = array.length, randomIndex;
-    while (currentIndex !== 0) {
-        randomIndex = Math.floor(Math.random() * currentIndex);
-        currentIndex--;
-        [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
     }
-    return array;
+    return newArray;
 };
 
 const generateSystemIdeas = (): DateIdea[] => {
-    const shuffledPool = shuffle([...SYSTEM_POOL]);
+    const shuffledPool = shuffle(SYSTEM_POOL);
     return shuffledPool.slice(0, 8).map((text, i) => ({
-        id: `sys-${i}-${Date.now()}`,
+        id: `sys-${i}-${Date.now()}-${Math.random()}`,
         text,
         color: COLORS[i % COLORS.length]
     }));
 };
 
 const INITIAL_IDEAS: DateIdea[] = [
-  { id: '1', text: '去山顶看一次云海', color: '#E0E7FF' },
-  { id: '2', text: '共同完成一幅油画', color: '#FAE8FF' },
+  { id: '1', text: '今日限定：一起去山顶看一次完整的日落', color: '#E0E7FF' },
+  { id: '2', text: '探店计划：去那家收藏很久但一直没机会去的餐厅', color: '#FAE8FF' },
 ];
 
 function App() {
-  const [ideas, setIdeas] = useState<DateIdea[]>(INITIAL_IDEAS);
-  const [completedIdeas, setCompletedIdeas] = useState<DateIdea[]>([]);
+  // 惰性初始化：确保刷新时不会因为 INITIAL_IDEAS 的短暂存在而导致数据被覆盖
+  const [ideas, setIdeas] = useState<DateIdea[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed.ideas)) {
+          return parsed.ideas;
+        }
+      }
+    } catch (e) {
+      console.error("加载自定义内容失败:", e);
+    }
+    return INITIAL_IDEAS;
+  });
+
+  const [completedIdeas, setCompletedIdeas] = useState<DateIdea[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && Array.isArray(parsed.completed)) {
+          return parsed.completed;
+        }
+      }
+    } catch (e) {
+      console.error("加载历史记录失败:", e);
+    }
+    return [];
+  });
+
   const [systemIdeas, setSystemIdeas] = useState<DateIdea[]>(generateSystemIdeas());
   const [wheelMode, setWheelMode] = useState<WheelMode>(WheelMode.SYSTEM);
   const [isSpinning, setIsSpinning] = useState(false);
   const [activeTab, setActiveTab] = useState<TabView>(TabView.WHEEL);
 
+  // 实时同步到本地存储
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ideas, completed: completedIdeas }));
+  }, [ideas, completedIdeas]);
+
+  // 当切换到系统模式或转盘停止时，刷新系统内容，保持新鲜感
   useEffect(() => {
     if (wheelMode === WheelMode.SYSTEM && !isSpinning) {
         setSystemIdeas(generateSystemIdeas());
     }
-  }, [wheelMode]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('spark-v5');
-    if (saved) {
-      const { ideas, completed } = JSON.parse(saved);
-      setIdeas(ideas || INITIAL_IDEAS);
-      setCompletedIdeas(completed || []);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('spark-v5', JSON.stringify({ ideas, completed: completedIdeas }));
-  }, [ideas, completedIdeas]);
+  }, [wheelMode, isSpinning]);
 
   const handleConfirmResult = (winner: DateIdea) => {
     if (wheelMode === WheelMode.CUSTOM) {
@@ -116,7 +152,6 @@ function App() {
       </nav>
 
       <main className="flex-1 flex flex-col md:flex-row relative">
-        {/* 转盘区域 */}
         <div className={`
             flex-1 flex flex-col items-center justify-center p-8 transition-all duration-700
             ${activeTab === TabView.WHEEL ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0 md:relative'}
@@ -150,7 +185,6 @@ function App() {
              />
         </div>
 
-        {/* 内容面板 */}
         <div className={`
             flex-1 bg-white md:border-l border-slate-50 p-12 md:p-20 overflow-y-auto no-scrollbar transition-all duration-700
             ${activeTab !== TabView.WHEEL ? 'translate-x-0 opacity-100' : 'translate-x-8 opacity-0 pointer-events-none absolute inset-0 md:relative'}

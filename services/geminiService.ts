@@ -7,10 +7,16 @@ export const generateDateIdeas = async (
   count: number = 5
 ): Promise<string[]> => {
   try {
-    const prompt = `为情侣生成 ${count} 个${currentMood}的简短约会活动建议。每个建议不超过8个字。例如：'一起做陶艺'，'去海边看日落'。请直接返回一个字符串数组。`;
+    const prompt = `为情侣生成 ${count} 个${currentMood}的今天可以做的具体活动建议。
+    要求：
+    1. 格式必须严格遵守：'主题：具体要做的事'。
+    2. 严禁出现“约会”这两个字。
+    3. 主题4-6字，具体说明不超过15个字。
+    4. 场景设定为两人尚未同居。
+    5. 直接返回字符串数组。请用中文回答。`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -30,7 +36,12 @@ export const generateDateIdeas = async (
     return [];
   } catch (error) {
     console.error("Error generating date ideas:", error);
-    // Fallback ideas in case of error
-    return ["去看午夜电影", "一起做顿大餐", "公园野餐", "拼乐高", "城市夜骑"];
+    return [
+      "微光影院：找一部老电影关灯一起看",
+      "美食探店：去附近评价最高的甜品店",
+      "手作时光：一起画一幅画或者拼乐高",
+      "漫步时刻：去附近的公园走走拍拍照",
+      "秘密厨艺：挑战用冰箱现有食材做新菜"
+    ];
   }
 };
